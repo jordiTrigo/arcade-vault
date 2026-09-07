@@ -1,6 +1,6 @@
 # SPEC 02 — Home / landing y reubicación de la Biblioteca
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 01
 > **Date:** 2026-09-07
 > **Objective:** Portar la pantalla de inicio (`home.jsx` de `references/templates/home-about/`) como la nueva landing en `/`, moviendo la Biblioteca actual (hoy en `/`) a `/juegos` y actualizando el `Nav` con los 4 links del prototipo.
