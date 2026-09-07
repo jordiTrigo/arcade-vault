@@ -1,6 +1,6 @@
 # SPEC 03 — Página "Acerca de" y envío de correo de contacto con Resend
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 02
 > **Date:** 2026-09-07
 > **Objective:** Portar la pantalla "Acerca de" (`about.jsx` de `references/templates/home-about/`) a `/acerca-de`, con su formulario de contacto enviando correos reales vía Resend a través de un Route Handler.
