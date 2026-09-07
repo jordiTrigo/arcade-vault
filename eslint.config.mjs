@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Standalone UX/behavior reference prototype (plain React + Babel via CDN,
+    // no build step, not imported by the app) — see CLAUDE.md.
+    "references/**",
   ]),
 ]);
 
