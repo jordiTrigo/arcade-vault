@@ -30,7 +30,7 @@ export async function POST(request: Request) {
 
   const { error } = await resend.emails.send({
     from: "Arcade Vault <onboarding@resend.dev>",
-    to: "jtrigo+arcade@gmail.com",
+    to: "jtrigo@gmail.com",
     replyTo: email,
     subject: "Nuevo mensaje de contacto — Arcade Vault",
     text: `Nombre: ${name}\nEmail: ${email}\n\n${msg}`,
