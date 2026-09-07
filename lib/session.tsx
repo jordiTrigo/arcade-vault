@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useSyncExternalStore } from "react";
 
 export type SessionUser = { name: string } | null;
 
@@ -12,25 +12,36 @@ type SessionContextValue = {
 
 const SessionContext = createContext<SessionContextValue | null>(null);
 
-export function SessionProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<SessionUser>(null);
+const listeners = new Set<() => void>();
 
-  useEffect(() => {
-    try {
-      setUser(JSON.parse(localStorage.getItem("av_user") || "null"));
-    } catch {
-      setUser(null);
-    }
-  }, []);
+function readUser(): SessionUser {
+  try {
+    return JSON.parse(localStorage.getItem("av_user") || "null");
+  } catch {
+    return null;
+  }
+}
+
+function subscribe(callback: () => void) {
+  listeners.add(callback);
+  return () => listeners.delete(callback);
+}
+
+function emitChange() {
+  listeners.forEach((l) => l());
+}
+
+export function SessionProvider({ children }: { children: React.ReactNode }) {
+  const user = useSyncExternalStore(subscribe, readUser, () => null);
 
   const login = (u: SessionUser) => {
-    setUser(u);
     localStorage.setItem("av_user", JSON.stringify(u));
+    emitChange();
   };
 
   const logout = () => {
-    setUser(null);
     localStorage.removeItem("av_user");
+    emitChange();
   };
 
   return (
