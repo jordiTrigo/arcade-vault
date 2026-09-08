@@ -24,6 +24,7 @@ export default function GameCard({ game }: { game: Game }) {
   };
 
   const goToDetail = () => router.push(`/juego/${game.id}`);
+  const goToPlay = () => router.push(`/juego/${game.id}/jugar`);
 
   return (
     <div
@@ -33,7 +34,13 @@ export default function GameCard({ game }: { game: Game }) {
       onMouseLeave={onLeave}
       onClick={goToDetail}
     >
-      <div className="cover">
+      <div
+        className="cover"
+        onClick={(e) => {
+          e.stopPropagation();
+          goToPlay();
+        }}
+      >
         <div className={"cover-bg " + game.cover}></div>
         <div className="label">{game.cat}</div>
       </div>
