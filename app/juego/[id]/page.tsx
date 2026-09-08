@@ -1,13 +1,18 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { GAMES, seededScores } from "@/lib/data";
+import { seededScores } from "@/lib/data";
+import { getGame } from "@/lib/games/data";
+import { getTopScores } from "@/lib/games/scores";
 
 export default async function GameDetailPage(props: PageProps<"/juego/[id]">) {
   const { id } = await props.params;
-  const game = GAMES.find((g) => g.id === id);
+  const game = await getGame(id);
   if (!game) notFound();
 
-  const scores = seededScores(id.length * 17 + 3, 10);
+  const scores =
+    id === "asteroides"
+      ? await getTopScores("asteroides", 10)
+      : seededScores(id.length * 17 + 3, 10);
 
   return (
     <div className="av-detail fade-in">
@@ -40,7 +45,10 @@ export default async function GameDetailPage(props: PageProps<"/juego/[id]">) {
             </div>
             <div>
               <div className="l">Dificultad</div>
-              <div className="v" style={{ color: "var(--yellow)", textShadow: "0 0 6px rgba(245,255,0,0.5)" }}>
+              <div
+                className="v"
+                style={{ color: "var(--yellow)", textShadow: "0 0 6px rgba(245,255,0,0.5)" }}
+              >
                 ★ ★ ★ ☆ ☆
               </div>
             </div>
@@ -60,11 +68,18 @@ export default async function GameDetailPage(props: PageProps<"/juego/[id]">) {
         <div className="leaderboard">
           <h3>MEJORES PUNTUACIONES</h3>
           {scores.map((r, i) => (
-            <div key={r.name} className={"lb-row" + (i === 0 ? " top1" : i === 1 ? " top2" : i === 2 ? " top3" : "")}>
+            <div
+              key={r.name}
+              className={
+                "lb-row" + (i === 0 ? " top1" : i === 1 ? " top2" : i === 2 ? " top3" : "")
+              }
+            >
               <div className="rk">#{String(r.rank).padStart(2, "0")}</div>
               <div className="pl">
                 {r.name}
-                <div style={{ fontSize: 10, color: "var(--ink-faint)", letterSpacing: "0.1em" }}>{r.date}</div>
+                <div style={{ fontSize: 10, color: "var(--ink-faint)", letterSpacing: "0.1em" }}>
+                  {r.date}
+                </div>
               </div>
               <div className="sc">{r.score.toLocaleString("es-ES")}</div>
             </div>
