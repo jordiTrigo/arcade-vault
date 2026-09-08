@@ -78,6 +78,17 @@ export const GAMES: Game[] = [
     plays: "15.6K",
   },
   {
+    id: "asteroides",
+    title: "ASTEROIDES",
+    short: "Motor real: pulveriza rocas en gravedad cero.",
+    long: "Versión con motor de juego real de la clásica lucha contra asteroides. Rota, propulsa y dispara para partir rocas en fragmentos cada vez más pequeños mientras subes de nivel y cazas el power-up de disparo triple.",
+    cat: "SHOOTER",
+    cover: "cover-rocas",
+    color: "yellow",
+    best: 0,
+    plays: "0",
+  },
+  {
     id: "ranaria",
     title: "RANARIA",
     short: "Cruza la autopista de pixeles.",
