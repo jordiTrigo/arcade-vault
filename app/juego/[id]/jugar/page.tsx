@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { GAMES } from "@/lib/data";
 import { useSession } from "@/lib/session";
 import { GAME_ENGINES, type GameEngineHandle, type GameEngineState } from "@/lib/games/registry";
+import { saveScore as saveScoreToSupabase } from "@/lib/games/scores";
 
 export default function GamePlayerPage() {
   const { id } = useParams<{ id: string }>();
@@ -58,12 +59,16 @@ export default function GamePlayerPage() {
     setSaved(false);
   };
 
-  const saveScore = () => {
-    try {
-      const all = JSON.parse(localStorage.getItem("av_scores") || "[]");
-      all.push({ game: game.id, score, name, at: Date.now() });
-      localStorage.setItem("av_scores", JSON.stringify(all));
-    } catch {}
+  const saveScore = async () => {
+    if (game.id === "asteroides") {
+      await saveScoreToSupabase("asteroides", name, score);
+    } else {
+      try {
+        const all = JSON.parse(localStorage.getItem("av_scores") || "[]");
+        all.push({ game: game.id, score, name, at: Date.now() });
+        localStorage.setItem("av_scores", JSON.stringify(all));
+      } catch {}
+    }
     setSaved(true);
   };
 
