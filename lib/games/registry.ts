@@ -22,6 +22,6 @@ type GameEngineComponent = ForwardRefExoticComponent<
   GameEngineProps & RefAttributes<GameEngineHandle>
 >;
 
-export const GAME_ENGINES: Record<string, GameEngineComponent> = {
+export const GAME_ENGINES: Partial<Record<string, GameEngineComponent>> = {
   asteroides: AsteroidsCanvas,
 };
