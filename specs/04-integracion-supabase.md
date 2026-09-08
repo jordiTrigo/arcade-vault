@@ -1,6 +1,6 @@
 # SPEC 04 — Integración base de Next.js con Supabase (clientes SSR)
 
-> **Status:** Implemented
+> **Status:** Implemented 
 > **Depends on:** SPEC 01
 > **Date:** 2026-09-08
 > **Objective:** Conectar la aplicación Next.js al proyecto de Supabase ya provisionado (`XXXXXXXXXXXXXXX`) con los clientes oficiales `@supabase/ssr`, sin tocar autenticación ni crear ninguna tabla todavía, como base de conexión para specs futuros.
