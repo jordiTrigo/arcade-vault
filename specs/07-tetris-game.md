@@ -1,6 +1,6 @@
 # SPEC 07 — Juego Tetris con motor real (canvas) y leaderboard en Supabase
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 01, SPEC 05, SPEC 06
 > **Date:** 2026-09-09
 > **Objective:** Portar el prototipo standalone de `references/started-games/03-tetris/` a un juego real y jugable dentro de Next.js, con id `tetris`, generalizando el patrón motor+leaderboard de SPEC 05/06 (hoy limitado a `asteroides`) para que cualquier id registrado en `GAME_ENGINES` use scores reales de Supabase.
@@ -96,23 +96,23 @@ Convenciones:
 
 ## Acceptance criteria
 
-- [ ] `GAME_ENGINES` en `lib/games/registry.ts` incluye `tetris: TetrisCanvas`.
-- [ ] `lib/games/data.ts`, `app/juego/[id]/page.tsx`, `app/juego/[id]/jugar/page.tsx` y `components/hall-of-fame.tsx` ya no contienen el literal `"asteroides"` como condición — usan `id in GAME_ENGINES` / `if (Engine)`.
-- [ ] `/juego/asteroides` y el tab `asteroides` de `/salon-de-la-fama` siguen mostrando exactamente el mismo comportamiento que antes de generalizar (sin regresión).
-- [ ] `GAMES` en `lib/data.ts` incluye una entrada `tetris` distinta de `caida` (ambas coexisten).
-- [ ] `select count(*) from games` incluye la fila `tetris` con los valores del Data model.
-- [ ] `/juego/tetris` muestra la ficha del juego con la portada `cover-tetris` y un leaderboard real (vacío hasta la primera partida guardada).
-- [ ] `/juego/tetris/jugar` monta dos canvas reales (tablero 300×600 y siguiente pieza 120×120) dentro del `.crt-screen`.
-- [ ] El `player-hud` de React muestra `Vidas: —` (constante) y `Puntuación`/`Nivel` reales del motor.
-- [ ] `←`/`→` mueven la pieza, `↑`/`X` rotan con wall kick, `↓` hace soft drop, `Espacio` hace hard drop.
-- [ ] La pieza fantasma se dibuja semitransparente en la posición donde aterrizaría la pieza actual.
-- [ ] Completar una línea la elimina, suma puntos según `LINE_SCORES × nivel` y sube el nivel cada 10 líneas.
-- [ ] Pulsar el botón `PAUSA` del contenedor React congela el descenso de la pieza; `REANUDAR` continúa sin salto de tiempo (la pieza no cae varias filas de golpe).
-- [ ] Llenar el tablero (una pieza nueva no puede aparecer) dispara `status: "gameover"` y abre el modal de React para guardar la puntuación.
-- [ ] Guardar el nombre en el modal inserta una fila en la tabla `scores` de Supabase con `game_id = "tetris"`.
-- [ ] El tab `TETRIS` en `/salon-de-la-fama` arma podio/tabla desde los scores reales guardados.
-- [ ] El mock `caida` sigue funcionando exactamente igual que antes (bucle de puntuación falso, `seededScores`).
-- [ ] `npm run lint` y `npm run build` terminan sin errores.
+- [x] `GAME_ENGINES` en `lib/games/registry.ts` incluye `tetris: TetrisCanvas`.
+- [x] `lib/games/data.ts`, `app/juego/[id]/page.tsx`, `app/juego/[id]/jugar/page.tsx` y `components/hall-of-fame.tsx` ya no contienen el literal `"asteroides"` como condición — usan `id in GAME_ENGINES` / `if (Engine)`.
+- [x] `/juego/asteroides` y el tab `asteroides` de `/salon-de-la-fama` siguen mostrando exactamente el mismo comportamiento que antes de generalizar (sin regresión).
+- [x] `GAMES` en `lib/data.ts` incluye una entrada `tetris` distinta de `caida` (ambas coexisten).
+- [x] `select count(*) from games` incluye la fila `tetris` con los valores del Data model.
+- [x] `/juego/tetris` muestra la ficha del juego con la portada `cover-tetris` y un leaderboard real (vacío hasta la primera partida guardada).
+- [x] `/juego/tetris/jugar` monta dos canvas reales (tablero 300×600 y siguiente pieza 120×120) dentro del `.crt-screen`.
+- [x] El `player-hud` de React muestra `Vidas: —` (constante) y `Puntuación`/`Nivel` reales del motor.
+- [x] `←`/`→` mueven la pieza, `↑`/`X` rotan con wall kick, `↓` hace soft drop, `Espacio` hace hard drop.
+- [x] La pieza fantasma se dibuja semitransparente en la posición donde aterrizaría la pieza actual.
+- [x] Completar una línea la elimina, suma puntos según `LINE_SCORES × nivel` y sube el nivel cada 10 líneas.
+- [x] Pulsar el botón `PAUSA` del contenedor React congela el descenso de la pieza; `REANUDAR` continúa sin salto de tiempo (la pieza no cae varias filas de golpe).
+- [x] Llenar el tablero (una pieza nueva no puede aparecer) dispara `status: "gameover"` y abre el modal de React para guardar la puntuación.
+- [x] Guardar el nombre en el modal inserta una fila en la tabla `scores` de Supabase con `game_id = "tetris"`.
+- [x] El tab `TETRIS` en `/salon-de-la-fama` arma podio/tabla desde los scores reales guardados.
+- [x] El mock `caida` sigue funcionando exactamente igual que antes (bucle de puntuación falso, `seededScores`).
+- [x] `npm run lint` y `npm run build` terminan sin errores.
 
 ## Decisions
 
