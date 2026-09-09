@@ -1,6 +1,6 @@
 # SPEC 09 — Juego Snake con motor real (canvas)
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 01, SPEC 05, SPEC 06
 > **Date:** 2026-09-09
 > **Objective:** Crear el juego Snake desde cero (sin prototipo de referencia, con sprites de fruta reales provistos en `references/source-assets/snake-assets/`) como motor real en canvas, id `snake`, integrado al leaderboard real de Supabase.
