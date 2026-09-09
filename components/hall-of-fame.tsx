@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { seededScores, type Game } from "@/lib/data";
 import { getTopScores } from "@/lib/games/scores";
+import { GAME_ENGINES } from "@/lib/games/registry";
 import { useSession } from "@/lib/session";
 
 type ScoreRow = { rank: number; name: string; score: number; date: string };
@@ -12,13 +13,13 @@ export default function HallOfFame({ games }: { games: Game[] }) {
   const router = useRouter();
   const { user } = useSession();
   const [tab, setTab] = useState(games[0].id);
-  const [asteroidesRows, setAsteroidesRows] = useState<ScoreRow[]>([]);
+  const [realRows, setRealRows] = useState<Record<string, ScoreRow[]>>({});
 
   useEffect(() => {
-    if (tab !== "asteroides") return;
+    if (!(tab in GAME_ENGINES)) return;
     let cancelled = false;
-    getTopScores("asteroides", 12).then((r) => {
-      if (!cancelled) setAsteroidesRows(r);
+    getTopScores(tab, 12).then((r) => {
+      if (!cancelled) setRealRows((prev) => ({ ...prev, [tab]: r }));
     });
     return () => {
       cancelled = true;
@@ -26,7 +27,7 @@ export default function HallOfFame({ games }: { games: Game[] }) {
   }, [tab]);
 
   const mockRows = useMemo(() => seededScores(tab.length * 23 + 7, 12), [tab]);
-  const rows = tab === "asteroides" ? asteroidesRows : mockRows;
+  const rows = tab in GAME_ENGINES ? (realRows[tab] ?? []) : mockRows;
   const game = games.find((g) => g.id === tab)!;
   const youRank = user ? Math.floor(8 + (tab.length % 4)) : null;
   const youScore = user ? rows[5]?.score - 2400 : null;

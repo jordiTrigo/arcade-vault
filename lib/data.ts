@@ -89,6 +89,17 @@ export const GAMES: Game[] = [
     plays: "0",
   },
   {
+    id: "tetris",
+    title: "TETRIS",
+    short: "Motor real: encaja piezas y limpia líneas sin parar.",
+    long: "Versión con motor de juego real del clásico Tetris. Rota y desliza las piezas clásicas (más una pieza especial) para completar líneas, con pieza fantasma y vista previa de la siguiente pieza, mientras la velocidad crece con cada nivel.",
+    cat: "PUZZLE",
+    cover: "cover-tetris",
+    color: "cyan",
+    best: 0,
+    plays: "0",
+  },
+  {
     id: "ranaria",
     title: "RANARIA",
     short: "Cruza la autopista de pixeles.",

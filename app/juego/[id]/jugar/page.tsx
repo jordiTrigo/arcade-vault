@@ -60,8 +60,8 @@ export default function GamePlayerPage() {
   };
 
   const saveScore = async () => {
-    if (game.id === "asteroides") {
-      await saveScoreToSupabase("asteroides", name, score);
+    if (Engine) {
+      await saveScoreToSupabase(game.id, name, score);
     } else {
       try {
         const all = JSON.parse(localStorage.getItem("av_scores") || "[]");
@@ -173,7 +173,7 @@ export default function GamePlayerPage() {
               <button className="btn" onClick={restart}>
                 JUGAR DE NUEVO
               </button>
-              <button className="btn magenta" onClick={() => router.push("/")}>
+              <button className="btn magenta" onClick={() => router.push("/juegos")}>
                 VOLVER AL VAULT
               </button>
             </div>
