@@ -173,6 +173,9 @@ export default function GamePlayerPage() {
               <button className="btn" onClick={restart}>
                 JUGAR DE NUEVO
               </button>
+              <button className="btn ghost" onClick={() => router.push(`/juego/${game.id}`)}>
+                VOLVER AL JUEGO
+              </button>
               <button className="btn magenta" onClick={() => router.push("/juegos")}>
                 VOLVER AL VAULT
               </button>
