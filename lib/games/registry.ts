@@ -12,7 +12,7 @@ export type GameEngineState = {
   score: number;
   lives: number;
   level: number;
-  status: "playing" | "dead" | "gameover";
+  status: "playing" | "dead" | "gameover" | "win";
 };
 
 export type GameEngineProps = {
