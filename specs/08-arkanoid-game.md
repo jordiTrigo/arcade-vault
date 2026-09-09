@@ -1,6 +1,6 @@
 # SPEC 08 — Juego Arkanoid con motor real (canvas) y leaderboard en Supabase
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 01, SPEC 05, SPEC 06
 > **Date:** 2026-09-09
 > **Objective:** Portar el prototipo standalone de `references/started-games/04-arkanoid/` a un juego real y jugable dentro de Next.js, con id `arkanoid`, incluyendo victoria en 5 niveles, control por teclado y mouse, sonido, y leaderboard real en Supabase vía el patrón ya generalizado por SPEC 07.
