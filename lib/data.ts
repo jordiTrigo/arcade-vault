@@ -45,6 +45,17 @@ export const GAMES: Game[] = [
     plays: "9.1K",
   },
   {
+    id: "snake",
+    title: "SNAKE",
+    short: "Sprites reales de fruta te esperan en la grilla.",
+    long: "Guía la serpiente por una grilla neón devorando frutas reales — banana, sandía, kiwi y más — mientras crece y acelera. Un giro en falso contra el borde o tu propia cola termina la partida.",
+    cat: "ARCADE",
+    cover: "cover-snake",
+    color: "green",
+    best: 0,
+    plays: "0",
+  },
+  {
     id: "gloton",
     title: "GLOTÓN",
     short: "Devora puntos y escapa de los fantasmas.",
