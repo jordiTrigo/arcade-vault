@@ -128,8 +128,8 @@ export function createSnakeGame(ctx: CanvasRenderingContext2D) {
 
   function drawGrid() {
     ctx.save();
-    ctx.globalAlpha = 0.15;
-    ctx.strokeStyle = "#8a8fb5";
+    ctx.globalAlpha = 0.35;
+    ctx.strokeStyle = "#0f5c2a";
     ctx.lineWidth = 0.5;
     for (let c = 1; c < GRID_COLS; c++) {
       ctx.beginPath();
@@ -146,11 +146,59 @@ export function createSnakeGame(ctx: CanvasRenderingContext2D) {
     ctx.restore();
   }
 
+  function drawSegment(seg: Cell, fill: string) {
+    const x = seg.col * CELL + 2;
+    const y = seg.row * CELL + 2;
+    const size = CELL - 4;
+
+    ctx.save();
+    ctx.shadowColor = "rgba(34, 255, 120, 0.55)";
+    ctx.shadowBlur = 6;
+    ctx.fillStyle = fill;
+    ctx.beginPath();
+    ctx.roundRect(x, y, size, size, 6);
+    ctx.fill();
+    ctx.restore();
+
+    // Textura de scanlines horizontales, como el resto del look CRT del arcade.
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(x, y, size, size, 6);
+    ctx.clip();
+    ctx.strokeStyle = "rgba(0, 0, 0, 0.25)";
+    ctx.lineWidth = 1;
+    for (let ly = y + 4; ly < y + size; ly += 5) {
+      ctx.beginPath();
+      ctx.moveTo(x, ly);
+      ctx.lineTo(x + size, ly);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawEyes(head: Cell) {
+    const forward = direction;
+    const perp = { x: -forward.dy, y: forward.dx };
+    const cx = head.col * CELL + CELL / 2 + forward.dx * CELL * 0.16;
+    const cy = head.row * CELL + CELL / 2 + forward.dy * CELL * 0.16;
+    const spread = CELL * 0.18;
+    const radius = CELL * 0.07;
+
+    ctx.fillStyle = "#062b0f";
+    [-1, 1].forEach((side) => {
+      const ex = cx + perp.x * spread * side;
+      const ey = cy + perp.y * spread * side;
+      ctx.beginPath();
+      ctx.arc(ex, ey, radius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
   function drawSnake() {
     body.forEach((seg, i) => {
-      ctx.fillStyle = i === 0 ? "#7CFC8A" : "#22c55e";
-      ctx.fillRect(seg.col * CELL + 1, seg.row * CELL + 1, CELL - 2, CELL - 2);
+      drawSegment(seg, i === 0 ? "#7CFC8A" : "#22c55e");
     });
+    drawEyes(body[0]);
   }
 
   function drawHUD() {
