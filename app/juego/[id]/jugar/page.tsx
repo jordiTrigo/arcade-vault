@@ -38,7 +38,7 @@ export default function GamePlayerPage() {
     setScore(state.score);
     setEngineLives(state.lives);
     setEngineLevel(state.level);
-    if (state.status === "gameover") setOver(true);
+    if (state.status === "gameover" || state.status === "win") setOver(true);
   };
 
   const togglePause = () => {
