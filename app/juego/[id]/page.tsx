@@ -3,6 +3,7 @@ import Link from "next/link";
 import { seededScores } from "@/lib/data";
 import { getGame } from "@/lib/games/data";
 import { getTopScores } from "@/lib/games/scores";
+import { GAME_ENGINES } from "@/lib/games/registry";
 
 export default async function GameDetailPage(props: PageProps<"/juego/[id]">) {
   const { id } = await props.params;
@@ -10,9 +11,7 @@ export default async function GameDetailPage(props: PageProps<"/juego/[id]">) {
   if (!game) notFound();
 
   const scores =
-    id === "asteroides"
-      ? await getTopScores("asteroides", 10)
-      : seededScores(id.length * 17 + 3, 10);
+    id in GAME_ENGINES ? await getTopScores(id, 10) : seededScores(id.length * 17 + 3, 10);
 
   return (
     <div className="av-detail fade-in">

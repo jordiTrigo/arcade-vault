@@ -60,8 +60,8 @@ export default function GamePlayerPage() {
   };
 
   const saveScore = async () => {
-    if (game.id === "asteroides") {
-      await saveScoreToSupabase("asteroides", name, score);
+    if (Engine) {
+      await saveScoreToSupabase(game.id, name, score);
     } else {
       try {
         const all = JSON.parse(localStorage.getItem("av_scores") || "[]");
