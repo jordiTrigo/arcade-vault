@@ -1,4 +1,4 @@
-import { FRUIT_NAMES, drawFruit, type FruitName } from "./sprites";
+import { FRUIT_NAMES, drawFruit, loadFruitsImage, type FruitName } from "./sprites";
 
 const GRID_COLS = 20;
 const GRID_ROWS = 20;
@@ -173,12 +173,14 @@ export function createSnakeGame(ctx: CanvasRenderingContext2D) {
   }
 
   initGame();
+  let ready = false;
 
   const game = {
     isPaused: false,
+    ready: false,
 
     update(dt: number) {
-      if (game.isPaused) return;
+      if (!ready || game.isPaused) return;
 
       if (status === "gameover") return;
 
@@ -198,6 +200,7 @@ export function createSnakeGame(ctx: CanvasRenderingContext2D) {
     },
 
     draw() {
+      if (!ready) return;
       ctx.fillStyle = "#000";
       ctx.fillRect(0, 0, W, H);
       drawGrid();
@@ -246,6 +249,11 @@ export function createSnakeGame(ctx: CanvasRenderingContext2D) {
       // sin efecto: el motor usa movimiento discreto por pasos de grilla, no teclas sostenidas
     },
   };
+
+  loadFruitsImage(() => {
+    ready = true;
+    game.ready = true;
+  });
 
   return game;
 }
