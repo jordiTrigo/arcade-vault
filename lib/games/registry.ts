@@ -2,6 +2,7 @@ import type { ForwardRefExoticComponent, RefAttributes } from "react";
 import { AsteroidsCanvas } from "./asteroides/AsteroidsCanvas";
 import { TetrisCanvas } from "./tetris/TetrisCanvas";
 import { ArkanoidCanvas } from "./arkanoid/ArkanoidCanvas";
+import { SnakeCanvas } from "./snake/SnakeCanvas";
 
 export type GameEngineHandle = {
   pause: () => void;
@@ -28,4 +29,5 @@ export const GAME_ENGINES: Partial<Record<string, GameEngineComponent>> = {
   asteroides: AsteroidsCanvas,
   tetris: TetrisCanvas,
   arkanoid: ArkanoidCanvas,
+  snake: SnakeCanvas,
 };
