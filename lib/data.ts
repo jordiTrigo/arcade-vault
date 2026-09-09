@@ -100,6 +100,17 @@ export const GAMES: Game[] = [
     plays: "0",
   },
   {
+    id: "arkanoid",
+    title: "ARKANOID",
+    short: "Motor real: rebota la pelota y destruye muros de neón.",
+    long: "Versión con motor de juego real del clásico rompebloques. Desliza la paleta con teclado o mouse para rebotar la pelota, pulveriza los 5 niveles de bloques cromáticos con velocidad creciente y complétalos todos para ganar.",
+    cat: "ARCADE",
+    cover: "cover-arkanoid",
+    color: "magenta",
+    best: 0,
+    plays: "0",
+  },
+  {
     id: "ranaria",
     title: "RANARIA",
     short: "Cruza la autopista de pixeles.",
