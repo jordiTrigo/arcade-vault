@@ -45,6 +45,7 @@ Para el listado completo de juegos del catálogo (cuáles tienen motor real vs. 
 - Usa siempre `/frontend-design` para diseñar la interfaz de usuario.
 - Este proyecto sigue desarrollo guiado por specs: usa `/spec` para redactar una spec nueva en `specs/`, `/spec-impl` para implementarla paso a paso, y `/spec-game` para specs que agregan un juego jugable nuevo. Instaladas en `.claude/skills/` (y espejadas en `.agents/skills/`).
 - `ui-ux-pro-max` disponible para decisiones de UI/UX más profundas (paletas, tipografías, accesibilidad) cuando `/frontend-design` no baste.
+- Agente `game-planner` (`.claude/agents/game-planner.md`): decide qué juego nuevo encaja con la plataforma y mantiene el To Do de sugerencias en `references/game-suggestions-todo.md`, recordando lo ya propuesto. Úsalo antes de `/spec-game`.
 
 ## Spec-driven workflow
 
