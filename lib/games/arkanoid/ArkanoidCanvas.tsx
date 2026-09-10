@@ -2,6 +2,8 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { createArkanoidGame, type ArkanoidGame, type ArkanoidState } from "./engine";
+import { SKINS } from "./skin";
+import type { SkinId } from "../skins";
 
 export type ArkanoidCanvasHandle = {
   pause: () => void;
@@ -11,18 +13,21 @@ export type ArkanoidCanvasHandle = {
 
 export type ArkanoidCanvasProps = {
   onStateChange: (state: ArkanoidState) => void;
+  skin: SkinId;
 };
 
 const KEYS = ["ArrowLeft", "ArrowRight"];
 
 export const ArkanoidCanvas = forwardRef<ArkanoidCanvasHandle, ArkanoidCanvasProps>(
-  function ArkanoidCanvas({ onStateChange }, ref) {
+  function ArkanoidCanvas({ onStateChange, skin }, ref) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const gameRef = useRef<ArkanoidGame | null>(null);
     const lastStateRef = useRef<ArkanoidState | null>(null);
     const lastTimeRef = useRef<number | null>(null);
     const rafRef = useRef<number>(0);
     const onStateChangeRef = useRef(onStateChange);
+    const skinRef = useRef(skin);
+    skinRef.current = skin;
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -53,7 +58,7 @@ export const ArkanoidCanvas = forwardRef<ArkanoidCanvasHandle, ArkanoidCanvasPro
       if (!canvas || !ctx) return;
 
       let cancelled = false;
-      const game = createArkanoidGame(ctx);
+      const game = createArkanoidGame(ctx, SKINS[skinRef.current]);
       gameRef.current = game;
       lastStateRef.current = null;
       lastTimeRef.current = null;
@@ -122,6 +127,11 @@ export const ArkanoidCanvas = forwardRef<ArkanoidCanvasHandle, ArkanoidCanvasPro
         gameRef.current = null;
       };
     }, []);
+
+    // Cambiar de skin no recrea el juego: solo repinta con otra paleta.
+    useEffect(() => {
+      gameRef.current?.setSkin(SKINS[skin]);
+    }, [skin]);
 
     return (
       <div style={{ position: "absolute", inset: 0 }}>

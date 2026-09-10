@@ -2,6 +2,8 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { createTetrisGame, type TetrisGame, type TetrisState } from "./engine";
+import type { SkinId } from "../skins";
+import { SKINS } from "./skin";
 
 export type TetrisCanvasHandle = {
   pause: () => void;
@@ -11,12 +13,14 @@ export type TetrisCanvasHandle = {
 
 export type TetrisCanvasProps = {
   onStateChange: (state: TetrisState) => void;
+  /** Paleta activa; se aplica en caliente sin reiniciar la partida. */
+  skin: SkinId;
 };
 
 const KEYS = ["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "KeyX", "Space"];
 
 export const TetrisCanvas = forwardRef<TetrisCanvasHandle, TetrisCanvasProps>(function TetrisCanvas(
-  { onStateChange },
+  { onStateChange, skin },
   ref,
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -26,6 +30,8 @@ export const TetrisCanvas = forwardRef<TetrisCanvasHandle, TetrisCanvasProps>(fu
   const lastTimeRef = useRef<number | null>(null);
   const rafRef = useRef<number>(0);
   const onStateChangeRef = useRef(onStateChange);
+  const skinRef = useRef(skin);
+  skinRef.current = skin;
 
   useEffect(() => {
     onStateChangeRef.current = onStateChange;
@@ -56,7 +62,7 @@ export const TetrisCanvas = forwardRef<TetrisCanvasHandle, TetrisCanvasProps>(fu
     const nextCtx = nextCanvas?.getContext("2d");
     if (!canvas || !nextCanvas || !ctx || !nextCtx) return;
 
-    const game = createTetrisGame(ctx, nextCtx);
+    const game = createTetrisGame(ctx, nextCtx, SKINS[skinRef.current]);
     gameRef.current = game;
     lastStateRef.current = null;
     lastTimeRef.current = null;
@@ -97,6 +103,12 @@ export const TetrisCanvas = forwardRef<TetrisCanvasHandle, TetrisCanvasProps>(fu
       gameRef.current = null;
     };
   }, []);
+
+  // Deliberadamente separado del efecto de creación: si `skin` entrara en sus
+  // deps, cambiar de paleta recrearía el juego y reiniciaría la partida.
+  useEffect(() => {
+    gameRef.current?.setSkin(SKINS[skin]);
+  }, [skin]);
 
   return (
     <div

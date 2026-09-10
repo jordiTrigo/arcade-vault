@@ -1,6 +1,9 @@
 // Motor de Asteroides portado 1:1 desde references/started-games/02-asteroids/game.js.
 // Sin variables globales de módulo: todo el estado vive en la closure de createAsteroidsGame.
 
+import { withAlpha } from "../skins";
+import type { AsteroidsSkin } from "./skin";
+
 const W = 800;
 const H = 600;
 
@@ -28,7 +31,8 @@ export type AsteroidsState = {
   status: AsteroidsStatus;
 };
 
-export function createAsteroidsGame(ctx: CanvasRenderingContext2D) {
+export function createAsteroidsGame(ctx: CanvasRenderingContext2D, initialSkin: AsteroidsSkin) {
+  let skin = initialSkin;
   const keysHeld: Record<string, boolean> = {};
   const justPressed: Record<string, boolean> = {};
 
@@ -64,7 +68,7 @@ export function createAsteroidsGame(ctx: CanvasRenderingContext2D) {
     }
 
     draw() {
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = skin.primaryAlt;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
       ctx.fill();
@@ -123,7 +127,7 @@ export function createAsteroidsGame(ctx: CanvasRenderingContext2D) {
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.rotate(this.rot);
-      ctx.strokeStyle = "#fff";
+      ctx.strokeStyle = skin.primary;
       ctx.lineWidth = 1.5;
       ctx.lineJoin = "round";
       ctx.beginPath();
@@ -167,12 +171,12 @@ export function createAsteroidsGame(ctx: CanvasRenderingContext2D) {
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.rotate(Math.PI / 4);
-      ctx.strokeStyle = "#0ff";
+      ctx.strokeStyle = skin.secondary;
       ctx.lineWidth = 2;
       const r = this.radius * pulse;
       ctx.strokeRect(-r, -r, r * 2, r * 2);
       ctx.restore();
-      ctx.fillStyle = "#0ff";
+      ctx.fillStyle = skin.secondary;
       ctx.font = "bold 12px monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -259,7 +263,7 @@ export function createAsteroidsGame(ctx: CanvasRenderingContext2D) {
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.rotate(this.angle);
-      ctx.strokeStyle = "#fff";
+      ctx.strokeStyle = skin.primary;
       ctx.lineWidth = 1.5;
       ctx.lineJoin = "round";
 
@@ -278,7 +282,7 @@ export function createAsteroidsGame(ctx: CanvasRenderingContext2D) {
         ctx.moveTo(-8, -4);
         ctx.lineTo(-8 - rand(6, 14), 0);
         ctx.lineTo(-8, 4);
-        ctx.strokeStyle = "rgba(255, 130, 0, 0.85)";
+        ctx.strokeStyle = withAlpha(skin.thruster, 0.85);
         ctx.stroke();
       }
 
@@ -316,7 +320,7 @@ export function createAsteroidsGame(ctx: CanvasRenderingContext2D) {
 
     draw() {
       const alpha = this.ttl / this.life;
-      ctx.strokeStyle = `rgba(255,255,255,${alpha.toFixed(2)})`;
+      ctx.strokeStyle = withAlpha(skin.particle, Number(alpha.toFixed(2)));
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(this.x, this.y);
@@ -400,7 +404,7 @@ export function createAsteroidsGame(ctx: CanvasRenderingContext2D) {
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(-Math.PI / 2);
-    ctx.strokeStyle = "#fff";
+    ctx.strokeStyle = skin.hud;
     ctx.lineWidth = 1.2;
     ctx.lineJoin = "round";
     ctx.beginPath();
@@ -414,7 +418,7 @@ export function createAsteroidsGame(ctx: CanvasRenderingContext2D) {
   }
 
   function drawHUD() {
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = skin.hud;
     ctx.font = "15px monospace";
 
     ctx.textAlign = "left";
@@ -427,18 +431,18 @@ export function createAsteroidsGame(ctx: CanvasRenderingContext2D) {
 
     if (ship.tripleShot > 0) {
       ctx.textAlign = "left";
-      ctx.fillStyle = "#0ff";
+      ctx.fillStyle = skin.accent;
       ctx.fillText(`3x  ${ship.tripleShot.toFixed(1)}s`, 14, 46);
     }
   }
 
   function drawOverlay(title: string, sub: string) {
     ctx.textAlign = "center";
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = skin.overlayTitle;
     ctx.font = "bold 46px monospace";
     ctx.fillText(title, W / 2, H / 2 - 18);
     ctx.font = "18px monospace";
-    ctx.fillStyle = "rgba(255,255,255,0.65)";
+    ctx.fillStyle = skin.overlaySub;
     ctx.fillText(sub, W / 2, H / 2 + 22);
   }
 
@@ -528,8 +532,16 @@ export function createAsteroidsGame(ctx: CanvasRenderingContext2D) {
     },
 
     draw() {
-      ctx.fillStyle = "#000";
+      ctx.fillStyle = skin.bg;
       ctx.fillRect(0, 0, W, H);
+
+      // El halo se aplica una vez para toda la escena; los save/restore internos
+      // de cada entidad vuelven a este estado. Con glow null queda en 0 (clasico).
+      ctx.save();
+      if (skin.glow) {
+        ctx.shadowColor = skin.glow.color;
+        ctx.shadowBlur = skin.glow.blur;
+      }
 
       particles.forEach((p) => p.draw());
       asteroids.forEach((a) => a.draw());
@@ -541,6 +553,8 @@ export function createAsteroidsGame(ctx: CanvasRenderingContext2D) {
 
       if (status === "gameover")
         drawOverlay("GAME OVER", `PUNTAJE: ${score}   —   ESPACIO PARA REINICIAR`);
+
+      ctx.restore();
     },
 
     getState(): AsteroidsState {
@@ -553,6 +567,11 @@ export function createAsteroidsGame(ctx: CanvasRenderingContext2D) {
 
     setPaused(v: boolean) {
       game.isPaused = v;
+    },
+
+    /** Cambia la paleta sin tocar score, vidas, nivel, pausa ni posiciones. */
+    setSkin(next: AsteroidsSkin) {
+      skin = next;
     },
 
     keyDown(code: string) {
