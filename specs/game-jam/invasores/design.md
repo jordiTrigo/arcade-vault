@@ -79,23 +79,33 @@ Al perder un cañón: explosión de 0.9 s durante la cual nada más se mueve, se
 
 **Victoria:** no existe. El juego es infinito por oleadas y `status` nunca reporta `"win"`. La única métrica de éxito es el score guardado en el leaderboard.
 
-## Arte y paleta neón
+## Arte y paleta por skin
 
-Todo se dibuja con primitivas de canvas sobre fondo `--bg` (`#0a0a0f`), usando los tokens ya definidos en `app/globals.css`:
+Todo se dibuja con primitivas de canvas. Como todo juego de `GAME_ENGINES`, invasores recibe
+`skin: InvadersSkin` (contrato `SkinRoles` de `lib/games/skins.ts`) y expone `setSkin(next)` — nunca
+colores literales sueltos en `engine.ts`. `clasico` es la paleta original de este diseño (los tokens
+de `app/globals.css` de abajo), `neon` la refuerza con glow, `retro` es el monocromo ámbar compartido
+por el resto de los juegos.
 
-| Elemento                       | Color                                 | Notas                                                                   |
-| ------------------------------ | ------------------------------------- | ----------------------------------------------------------------------- |
-| Cañón del jugador              | `--cyan` (`#00f5ff`)                  | Base trapezoidal + torreta central, con `shadowBlur` para el halo neón  |
-| Alienígena fila 1 (tipo 0)     | `--magenta` (`#ff006e`)               | El más valioso, el más arriba                                           |
-| Alienígenas filas 2–3 (tipo 1) | `--yellow` (`#f5ff00`)                |                                                                         |
-| Alienígenas filas 4–5 (tipo 2) | `--green` (`#00ff88`)                 | Coherente con el `color: green` de la ficha de catálogo                 |
-| Búnkeres                       | `--green` con alfa 0.85               | Celdas apagadas simplemente no se dibujan                               |
-| OVNI                           | `--magenta` con halo pulsante         | Silueta lenticular ancha, distinta de cualquier alienígena              |
-| Bala del jugador               | `--cyan`                              | Rectángulo de 3×14 px                                                   |
-| Balas enemigas                 | `--yellow`                            | Rectángulo de 3×12 px con leve zigzag por fotograma                     |
-| Línea de defensa               | `--magenta` con alfa 0.25             | Línea horizontal punteada, avisa visualmente del límite                 |
-| HUD nativo (canvas)            | `--ink` (`#e6e9ff`) / `--ink-dim`     | Puntuación arriba-izquierda, oleada arriba-centro, vidas arriba-derecha |
-| Overlay "GAME OVER"            | `--magenta` sobre velo `#0a0a0f` α0.7 | Convive con el modal de React                                           |
+| Elemento (rol de `SkinRoles`)                      | `clasico`                             | `neon`                              | `retro`                                  |
+| -------------------------------------------------- | ------------------------------------- | ----------------------------------- | ---------------------------------------- |
+| Fondo (`bg`)                                       | `--bg` `#0a0a0f`                      | `#0a0a0f`                           | `#0d0800`                                |
+| Cañón del jugador (`primary`)                      | `--cyan` `#00f5ff`, `shadowBlur` halo | `#00f5ff`, glow más intenso         | `#ffb000`, halo corto                    |
+| Alien fila 1 / tipo 0 (`secondary`)                | `--magenta` `#ff006e`                 | `#ff006e`                           | `#ff8a1f`                                |
+| Alien filas 2–3 / tipo 1 (`accent`)                | `--yellow` `#f5ff00`                  | `#f5ff00`                           | `#ffd27f`                                |
+| Alien filas 4–5 / tipo 2 (`primaryAlt`)            | `--green` `#00ff88`                   | `#00ff88`                           | `#c77800`                                |
+| Búnkeres (`primaryAlt` + `gridAlpha`)              | `--green` α0.85                       | `#00ff88` α0.85                     | `#c77800` α0.85                          |
+| OVNI (`secondary` + `glow`)                        | `--magenta`, halo pulsante            | `#ff006e`, halo más ancho           | `#ff8a1f`, halo corto                    |
+| Bala del jugador (`primary`)                       | `--cyan`, 3×14 px                     | `#00f5ff`                           | `#ffb000`                                |
+| Balas enemigas (`accent`)                          | `--yellow`, 3×12 px                   | `#f5ff00`                           | `#ffd27f`                                |
+| Línea de defensa (`secondary` + alfa)              | `--magenta` α0.25                     | `#ff006e` α0.25                     | `#ff8a1f` α0.35                          |
+| HUD nativo (`hud`)                                 | `--ink` `#e6e9ff`                     | `#e6e9ff`                           | `#ffd27f`                                |
+| Overlay "GAME OVER" (`overlayTitle`/`overlayVeil`) | `--magenta` sobre velo `#0a0a0f` α0.7 | `#ff006e` sobre velo `#0a0a0f` α0.7 | `#ffb000` sobre velo `rgba(13,8,0,0.72)` |
+
+Nota de implementación: `clasico` y `neon` coinciden en valores porque este diseño ya nació con la
+paleta neón del shell — la separación entre ambas skins queda en la intensidad del `glow`, no en el
+hue. Las rampas multicolor de esta tabla (alien tipo 0/1/2 en `retro`) tienen que pasar la auditoría
+de separación por luminancia de `lib/games/contrast.ts` antes de darse por buenas.
 
 Los alienígenas se dibujan desde **matrices de bits** de 11×8 definidas como arrays de strings en `engine.ts`, escaladas por un factor de 3 px por bit. Cada tipo tiene dos fotogramas que alternan en cada salto de la formación: el clásico "aleteo" sincronizado con el movimiento, gratis en costo de assets.
 

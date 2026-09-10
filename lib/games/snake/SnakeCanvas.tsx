@@ -2,6 +2,8 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { createSnakeGame, type SnakeGame, type SnakeState } from "./engine";
+import type { SkinId } from "../skins";
+import { SKINS } from "./skin";
 
 export type SnakeCanvasHandle = {
   pause: () => void;
@@ -11,12 +13,13 @@ export type SnakeCanvasHandle = {
 
 export type SnakeCanvasProps = {
   onStateChange: (state: SnakeState) => void;
+  skin: SkinId;
 };
 
 const KEYS = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
 
 export const SnakeCanvas = forwardRef<SnakeCanvasHandle, SnakeCanvasProps>(function SnakeCanvas(
-  { onStateChange },
+  { onStateChange, skin },
   ref,
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -25,6 +28,8 @@ export const SnakeCanvas = forwardRef<SnakeCanvasHandle, SnakeCanvasProps>(funct
   const lastTimeRef = useRef<number | null>(null);
   const rafRef = useRef<number>(0);
   const onStateChangeRef = useRef(onStateChange);
+  const skinRef = useRef(skin);
+  skinRef.current = skin;
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -55,7 +60,7 @@ export const SnakeCanvas = forwardRef<SnakeCanvasHandle, SnakeCanvasProps>(funct
     if (!canvas || !ctx) return;
 
     let cancelled = false;
-    const game = createSnakeGame(ctx);
+    const game = createSnakeGame(ctx, SKINS[skinRef.current]);
     gameRef.current = game;
     lastStateRef.current = null;
     lastTimeRef.current = null;
@@ -114,6 +119,12 @@ export const SnakeCanvas = forwardRef<SnakeCanvasHandle, SnakeCanvasProps>(funct
       gameRef.current = null;
     };
   }, []);
+
+  // Deliberadamente separado del efecto de creación: si `skin` entrara en sus
+  // deps, cambiar de skin recrearía el juego y reiniciaría la partida.
+  useEffect(() => {
+    gameRef.current?.setSkin(SKINS[skin]);
+  }, [skin]);
 
   return (
     <div style={{ position: "absolute", inset: 0 }}>

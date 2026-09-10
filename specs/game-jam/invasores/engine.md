@@ -7,7 +7,7 @@
 ## Firma de la factory
 
 ```ts
-export function createInvadersGame(ctx: CanvasRenderingContext2D): InvadersGame;
+export function createInvadersGame(ctx: CanvasRenderingContext2D, skin: InvadersSkin): InvadersGame;
 
 export type InvadersState = {
   score: number;
@@ -23,12 +23,20 @@ export type InvadersGame = {
   getState(): InvadersState;
   reset(): void;
   setPaused(v: boolean): void;
+  setSkin(next: InvadersSkin): void;
   keyDown(code: string): void;
   keyUp(code: string): void;
 };
 ```
 
-Un solo `ctx`, un solo canvas de 800×600. Sin React, sin `document`, sin lectura de variables CSS: los colores van como literales tomados de los tokens de `app/globals.css` (ver tabla de paleta en `design.md`). El tipo `InvadersState` es estructuralmente idéntico a `GameEngineState` de `lib/games/registry.ts`; el contrato no se amplía y `"win"` no se emite nunca.
+Un solo `ctx`, un solo canvas de 800×600. Sin React, sin `document`, sin `getComputedStyle`: los
+colores nunca son literales sueltos — vienen todos de `skin: InvadersSkin`
+(`lib/games/invasores/skin.ts`, contrato `SkinRoles` de `lib/games/skins.ts`; ver tabla de paleta por
+skin en `design.md`). `skin` entra como último parámetro de la factoría y se guarda en closure
+(`let skin = initialSkin`, nunca variable de módulo); `setSkin(next)` la reemplaza sin tocar
+`score`/`lives`/`level`/`isPaused` ni las posiciones en juego, para poder cambiar de skin en medio de
+una partida sin resetearla. El tipo `InvadersState` es estructuralmente idéntico a
+`GameEngineState` de `lib/games/registry.ts`; el contrato no se amplía y `"win"` no se emite nunca.
 
 ## Estado en closure
 

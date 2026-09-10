@@ -73,6 +73,10 @@ export function loadFruitsImage(cb: () => void) {
   img.src = "/games/snake/fruits.png";
 }
 
+/**
+ * `filter` es un filtro de canvas opcional que aporta la skin. Nunca mueve el
+ * hue: la fruta tiene que seguir reconociendose como esa fruta.
+ */
 export function drawFruit(
   ctx: CanvasRenderingContext2D,
   name: FruitName,
@@ -80,6 +84,7 @@ export function drawFruit(
   y: number,
   w: number,
   h: number,
+  filter = "none",
 ) {
   if (!fruitsLoaded || !fruitsImg) return;
   const frame = FRUIT_ATLAS[name];
@@ -88,5 +93,8 @@ export function drawFruit(
   const dh = frame.h * scale;
   const dx = x + (w - dw) / 2;
   const dy = y + (h - dh) / 2;
+  ctx.save();
+  ctx.filter = filter;
   ctx.drawImage(fruitsImg, frame.x, frame.y, frame.w, frame.h, dx, dy, dw, dh);
+  ctx.restore();
 }

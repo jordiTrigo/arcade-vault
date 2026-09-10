@@ -2,6 +2,8 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { createAsteroidsGame, type AsteroidsGame, type AsteroidsState } from "./engine";
+import type { SkinId } from "../skins";
+import { SKINS } from "./skin";
 
 export type AsteroidsCanvasHandle = {
   pause: () => void;
@@ -11,18 +13,22 @@ export type AsteroidsCanvasHandle = {
 
 export type AsteroidsCanvasProps = {
   onStateChange: (state: AsteroidsState) => void;
+  /** Paleta activa; se aplica en caliente sin reiniciar la partida. */
+  skin: SkinId;
 };
 
 const KEYS = ["ArrowLeft", "ArrowRight", "ArrowUp", "Space"];
 
 export const AsteroidsCanvas = forwardRef<AsteroidsCanvasHandle, AsteroidsCanvasProps>(
-  function AsteroidsCanvas({ onStateChange }, ref) {
+  function AsteroidsCanvas({ onStateChange, skin }, ref) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const gameRef = useRef<AsteroidsGame | null>(null);
     const lastStateRef = useRef<AsteroidsState | null>(null);
     const lastTimeRef = useRef<number | null>(null);
     const rafRef = useRef<number>(0);
     const onStateChangeRef = useRef(onStateChange);
+    const skinRef = useRef(skin);
+    skinRef.current = skin;
 
     useEffect(() => {
       onStateChangeRef.current = onStateChange;
@@ -51,7 +57,7 @@ export const AsteroidsCanvas = forwardRef<AsteroidsCanvasHandle, AsteroidsCanvas
       const ctx = canvas?.getContext("2d");
       if (!canvas || !ctx) return;
 
-      const game = createAsteroidsGame(ctx);
+      const game = createAsteroidsGame(ctx, SKINS[skinRef.current]);
       gameRef.current = game;
       lastStateRef.current = null;
       lastTimeRef.current = null;
@@ -100,6 +106,12 @@ export const AsteroidsCanvas = forwardRef<AsteroidsCanvasHandle, AsteroidsCanvas
         gameRef.current = null;
       };
     }, []);
+
+    // Deliberadamente separado del efecto de creación: si `skin` entrara en sus
+    // deps, cambiar de paleta recrearía el juego y reiniciaría la partida.
+    useEffect(() => {
+      gameRef.current?.setSkin(SKINS[skin]);
+    }, [skin]);
 
     return (
       <canvas

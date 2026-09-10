@@ -3,6 +3,7 @@ import { AsteroidsCanvas } from "./asteroides/AsteroidsCanvas";
 import { TetrisCanvas } from "./tetris/TetrisCanvas";
 import { ArkanoidCanvas } from "./arkanoid/ArkanoidCanvas";
 import { SnakeCanvas } from "./snake/SnakeCanvas";
+import type { SkinId } from "./skins";
 
 export type GameEngineHandle = {
   pause: () => void;
@@ -19,6 +20,7 @@ export type GameEngineState = {
 
 export type GameEngineProps = {
   onStateChange: (state: GameEngineState) => void;
+  skin: SkinId;
 };
 
 type GameEngineComponent = ForwardRefExoticComponent<
@@ -31,3 +33,5 @@ export const GAME_ENGINES: Partial<Record<string, GameEngineComponent>> = {
   arkanoid: ArkanoidCanvas,
   snake: SnakeCanvas,
 };
+
+export const GAME_ENGINE_IDS = Object.keys(GAME_ENGINES);

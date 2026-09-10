@@ -3,9 +3,11 @@
 // Overlay de pausa con selector de nivel y tecla P/Escape del original: eliminados (ver SPEC 08).
 
 import { LEVELS, type BlockColor } from "./levels";
+import type { ArkanoidSkin } from "./skin";
 import {
   drawSprite,
   drawFrame,
+  getSheet,
   loadSpritesheet,
   EXPLOSION_FRAMES,
   EXPLOSION_DURATION,
@@ -40,7 +42,9 @@ function playSound(audio: HTMLAudioElement) {
   el.play().catch(() => {});
 }
 
-export function createArkanoidGame(ctx: CanvasRenderingContext2D) {
+export function createArkanoidGame(ctx: CanvasRenderingContext2D, initialSkin: ArkanoidSkin) {
+  let skin = initialSkin;
+
   const paddle = { x: 0, y: 560, w: 81, h: 14 };
   const ball = { x: 0, y: 0, w: 16, h: 16, vx: BASE_BALL_VX, vy: BASE_BALL_VY };
 
@@ -180,25 +184,33 @@ export function createArkanoidGame(ctx: CanvasRenderingContext2D) {
 
     draw() {
       if (!ready) return;
+      const sheet = getSheet(skin);
+      if (!sheet) return;
 
-      ctx.fillStyle = "#000";
+      ctx.fillStyle = skin.bg;
       ctx.fillRect(0, 0, W, H);
 
       for (const block of blocks) {
         if (block.alive)
-          drawSprite(ctx, `block_${block.color}`, block.x, block.y, block.w, block.h);
+          drawSprite(ctx, sheet, `block_${block.color}`, block.x, block.y, block.w, block.h);
       }
 
       for (const exp of explosions) {
         const frameIndex = Math.min(Math.floor((exp.elapsed / EXPLOSION_DURATION) * 4), 3);
-        drawFrame(ctx, EXPLOSION_FRAMES[exp.color][frameIndex], exp.x, exp.y, exp.w, exp.h);
+        drawFrame(ctx, sheet, EXPLOSION_FRAMES[exp.color][frameIndex], exp.x, exp.y, exp.w, exp.h);
       }
 
-      drawSprite(ctx, "paddle", paddle.x, paddle.y, paddle.w, paddle.h);
-      drawSprite(ctx, "ball", ball.x, ball.y, ball.w, ball.h);
+      // El halo se aplica solo a paddle y pelota: envolver los sesenta bloques
+      // con shadowBlur cuesta demasiado por frame. Con glow null (clasico) el
+      // blur queda en 0 y el render es identico al de antes de la conversion.
+      ctx.shadowColor = skin.glow?.color ?? "transparent";
+      ctx.shadowBlur = skin.glow?.blur ?? 0;
+      drawSprite(ctx, sheet, "paddle", paddle.x, paddle.y, paddle.w, paddle.h);
+      drawSprite(ctx, sheet, "ball", ball.x, ball.y, ball.w, ball.h);
+      ctx.shadowBlur = 0;
 
       if (status === "playing") {
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = skin.hud;
         ctx.font = "bold 18px monospace";
         ctx.textAlign = "left";
         ctx.textBaseline = "top";
@@ -209,14 +221,14 @@ export function createArkanoidGame(ctx: CanvasRenderingContext2D) {
         const ballSpacing = 4;
         for (let i = 0; i < lives; i++) {
           const bx = W - 10 - (lives - i) * (ballSize + ballSpacing);
-          drawSprite(ctx, "ball", bx, 10, ballSize, ballSize);
+          drawSprite(ctx, sheet, "ball", bx, 10, ballSize, ballSize);
         }
       }
 
       if (status === "gameover" || status === "win") {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+        ctx.fillStyle = skin.overlayVeil;
         ctx.fillRect(0, 0, W, H);
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = skin.overlayTitle;
         ctx.font = "bold 48px monospace";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -235,6 +247,11 @@ export function createArkanoidGame(ctx: CanvasRenderingContext2D) {
 
     setPaused(v: boolean) {
       game.isPaused = v;
+    },
+
+    /** Cambia la paleta sin tocar score, vidas, nivel, pausa ni posiciones. */
+    setSkin(next: ArkanoidSkin) {
+      skin = next;
     },
 
     keyDown(code: string) {

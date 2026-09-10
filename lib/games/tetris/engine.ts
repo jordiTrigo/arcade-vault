@@ -1,3 +1,6 @@
+import { withAlpha } from "../skins";
+import type { TetrisSkin } from "./skin";
+
 // Motor de Tetris portado 1:1 desde references/started-games/03-tetris/game.js.
 // Sin variables globales de módulo: todo el estado vive en la closure de createTetrisGame.
 // A diferencia de Asteroides, update(dt) recibe dt en milisegundos crudos (no segundos),
@@ -11,18 +14,6 @@ const NEXT_SIZE = 120;
 
 const W = COLS * BLOCK;
 const H = ROWS * BLOCK;
-
-const COLORS = [
-  null,
-  "#4dd0e1", // I - cyan
-  "#ffd54f", // O - yellow
-  "#ba68c8", // T - purple
-  "#81c784", // S - green
-  "#e57373", // Z - red
-  "#90caf9", // J - pale blue
-  "#ffb74d", // L - orange
-  "#9e9e9e", // N - tuerca (gris metálico)
-];
 
 const PIECES: (number[][] | null)[] = [
   null,
@@ -81,7 +72,12 @@ export type TetrisState = {
   status: TetrisStatus;
 };
 
-export function createTetrisGame(ctx: CanvasRenderingContext2D, nextCtx: CanvasRenderingContext2D) {
+export function createTetrisGame(
+  ctx: CanvasRenderingContext2D,
+  nextCtx: CanvasRenderingContext2D,
+  initialSkin: TetrisSkin,
+) {
+  let skin = initialSkin;
   let board: number[][];
   let current: Piece;
   let next: Piece;
@@ -204,21 +200,18 @@ export function createTetrisGame(ctx: CanvasRenderingContext2D, nextCtx: CanvasR
     alpha?: number,
   ) {
     if (!colorIndex) return;
-    const color = COLORS[colorIndex];
     context.globalAlpha = alpha ?? 1;
-    context.fillStyle = color!;
+    context.fillStyle = skin.pieces[colorIndex - 1];
     context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
-    context.fillStyle = "rgba(255,255,255,0.12)";
+    context.fillStyle = withAlpha(skin.sheen, 0.12);
     context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
     context.globalAlpha = 1;
   }
 
   function drawGrid() {
-    const gridColor =
-      getComputedStyle(document.body).getPropertyValue("--ink-dim").trim() || "#8a8fb5";
     ctx.save();
-    ctx.globalAlpha = 0.25;
-    ctx.strokeStyle = gridColor;
+    ctx.globalAlpha = skin.gridAlpha;
+    ctx.strokeStyle = skin.grid;
     ctx.lineWidth = 0.5;
     for (let c = 1; c < COLS; c++) {
       ctx.beginPath();
@@ -237,10 +230,21 @@ export function createTetrisGame(ctx: CanvasRenderingContext2D, nextCtx: CanvasR
 
   function drawBoard() {
     ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = skin.bg;
+    ctx.fillRect(0, 0, W, H);
     drawGrid();
 
     for (let r = 0; r < ROWS; r++)
       for (let c = 0; c < COLS; c++) drawBlock(ctx, c, r, board[r][c], BLOCK);
+
+    // El halo solo envuelve fantasma y pieza activa (una decena de bloques): con
+    // los 200 del tablero el shadowBlur por fillRect cuesta demasiado por frame.
+    // Con glow null (clasico) el blur queda en 0 y el render es el de siempre.
+    ctx.save();
+    if (skin.glow) {
+      ctx.shadowColor = skin.glow.color;
+      ctx.shadowBlur = skin.glow.blur;
+    }
 
     const gy = ghostY();
     for (let r = 0; r < current.shape.length; r++)
@@ -251,6 +255,8 @@ export function createTetrisGame(ctx: CanvasRenderingContext2D, nextCtx: CanvasR
     for (let r = 0; r < current.shape.length; r++)
       for (let c = 0; c < current.shape[r].length; c++)
         drawBlock(ctx, current.x + c, current.y + r, current.shape[r][c], BLOCK);
+
+    ctx.restore();
   }
 
   function drawNextPreview() {
@@ -308,6 +314,14 @@ export function createTetrisGame(ctx: CanvasRenderingContext2D, nextCtx: CanvasR
 
     setPaused(v: boolean) {
       game.isPaused = v;
+    },
+
+    /** Cambia la paleta sin tocar score, nivel, pausa ni el tablero. */
+    setSkin(next: TetrisSkin) {
+      skin = next;
+      // El preview de la proxima pieza solo se redibuja al spawnear: sin este
+      // repintado se quedaria con los colores de la skin anterior.
+      drawNextPreview();
     },
 
     keyDown(code: string) {

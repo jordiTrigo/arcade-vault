@@ -1,4 +1,6 @@
+import { withAlpha } from "../skins";
 import { FRUIT_NAMES, drawFruit, loadFruitsImage, type FruitName } from "./sprites";
+import type { SnakeSkin } from "./skin";
 
 const GRID_COLS = 20;
 const GRID_ROWS = 20;
@@ -11,6 +13,8 @@ const POINTS_PER_FRUIT = 10;
 const INITIAL_LENGTH = 3;
 const MAX_STEPS_PER_FRAME = 5;
 const DEAD_FREEZE_MS = 400;
+const GLOW_ALPHA = 0.55; // alfa del halo de cada segmento, como en el original
+const SCANLINE_ALPHA = 0.25;
 
 const W = GRID_COLS * CELL;
 const H = GRID_ROWS * CELL;
@@ -32,7 +36,8 @@ export type SnakeState = {
   status: SnakeStatus;
 };
 
-export function createSnakeGame(ctx: CanvasRenderingContext2D) {
+export function createSnakeGame(ctx: CanvasRenderingContext2D, initialSkin: SnakeSkin) {
+  let skin = initialSkin;
   let body: Cell[];
   let direction: Direction;
   let pendingDirection: Direction;
@@ -128,8 +133,8 @@ export function createSnakeGame(ctx: CanvasRenderingContext2D) {
 
   function drawGrid() {
     ctx.save();
-    ctx.globalAlpha = 0.35;
-    ctx.strokeStyle = "#0f5c2a";
+    ctx.globalAlpha = skin.gridAlpha;
+    ctx.strokeStyle = skin.grid;
     ctx.lineWidth = 0.5;
     for (let c = 1; c < GRID_COLS; c++) {
       ctx.beginPath();
@@ -152,8 +157,10 @@ export function createSnakeGame(ctx: CanvasRenderingContext2D) {
     const size = CELL - 4;
 
     ctx.save();
-    ctx.shadowColor = "rgba(34, 255, 120, 0.55)";
-    ctx.shadowBlur = 6;
+    if (skin.glow) {
+      ctx.shadowColor = withAlpha(skin.glow.color, GLOW_ALPHA);
+      ctx.shadowBlur = skin.glow.blur;
+    }
     ctx.fillStyle = fill;
     ctx.beginPath();
     ctx.roundRect(x, y, size, size, 6);
@@ -165,7 +172,7 @@ export function createSnakeGame(ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
     ctx.roundRect(x, y, size, size, 6);
     ctx.clip();
-    ctx.strokeStyle = "rgba(0, 0, 0, 0.25)";
+    ctx.strokeStyle = withAlpha(skin.scanline, SCANLINE_ALPHA);
     ctx.lineWidth = 1;
     for (let ly = y + 4; ly < y + size; ly += 5) {
       ctx.beginPath();
@@ -184,7 +191,7 @@ export function createSnakeGame(ctx: CanvasRenderingContext2D) {
     const spread = CELL * 0.18;
     const radius = CELL * 0.07;
 
-    ctx.fillStyle = "#062b0f";
+    ctx.fillStyle = skin.primaryInk;
     [-1, 1].forEach((side) => {
       const ex = cx + perp.x * spread * side;
       const ey = cy + perp.y * spread * side;
@@ -196,13 +203,13 @@ export function createSnakeGame(ctx: CanvasRenderingContext2D) {
 
   function drawSnake() {
     body.forEach((seg, i) => {
-      drawSegment(seg, i === 0 ? "#7CFC8A" : "#22c55e");
+      drawSegment(seg, i === 0 ? skin.primary : skin.primaryAlt);
     });
     drawEyes(body[0]);
   }
 
   function drawHUD() {
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = skin.hud;
     ctx.font = "15px monospace";
     ctx.textAlign = "left";
     ctx.fillText(`SCORE  ${score}`, 14, 26);
@@ -212,11 +219,11 @@ export function createSnakeGame(ctx: CanvasRenderingContext2D) {
 
   function drawOverlay() {
     ctx.textAlign = "center";
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = skin.overlayTitle;
     ctx.font = "bold 46px monospace";
     ctx.fillText("GAME OVER", W / 2, H / 2 - 18);
     ctx.font = "18px monospace";
-    ctx.fillStyle = "rgba(255,255,255,0.65)";
+    ctx.fillStyle = skin.overlaySub;
     ctx.fillText(`PUNTAJE: ${score}`, W / 2, H / 2 + 22);
   }
 
@@ -249,11 +256,11 @@ export function createSnakeGame(ctx: CanvasRenderingContext2D) {
 
     draw() {
       if (!ready) return;
-      ctx.fillStyle = "#000";
+      ctx.fillStyle = skin.bg;
       ctx.fillRect(0, 0, W, H);
       drawGrid();
       drawSnake();
-      drawFruit(ctx, fruit.name, fruit.col * CELL, fruit.row * CELL, CELL, CELL);
+      drawFruit(ctx, fruit.name, fruit.col * CELL, fruit.row * CELL, CELL, CELL, skin.fruitFilter);
       drawHUD();
       if (status === "gameover") drawOverlay();
     },
@@ -268,6 +275,15 @@ export function createSnakeGame(ctx: CanvasRenderingContext2D) {
 
     setPaused(v: boolean) {
       game.isPaused = v;
+    },
+
+    /**
+     * Cambia solo la paleta: no toca `score`, `level`, `status` ni el cuerpo de
+     * la serpiente, asi que se puede cambiar de skin en plena partida. El
+     * repintado sale solo, porque todo el tablero se redibuja cada frame.
+     */
+    setSkin(next: SnakeSkin) {
+      skin = next;
     },
 
     keyDown(code: string) {

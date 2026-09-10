@@ -7,6 +7,9 @@ import { GAMES } from "@/lib/data";
 import { useSession } from "@/lib/session";
 import { GAME_ENGINES, type GameEngineHandle, type GameEngineState } from "@/lib/games/registry";
 import { saveScore as saveScoreToSupabase } from "@/lib/games/scores";
+import { SKINNED_GAMES, SKIN_LABELS } from "@/lib/games/skins";
+import { useSkin } from "@/lib/games/use-skin";
+import { SkinPicker } from "@/components/skin-picker";
 
 export default function GamePlayerPage() {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +20,7 @@ export default function GamePlayerPage() {
 
   const Engine = GAME_ENGINES[id];
   const engineRef = useRef<GameEngineHandle>(null);
+  const [skin, setSkin] = useSkin(id);
 
   const [score, setScore] = useState(0);
   const [engineLives, setEngineLives] = useState(3);
@@ -96,6 +100,7 @@ export default function GamePlayerPage() {
           </div>
         </div>
         <div className="hud-actions">
+          {Engine && SKINNED_GAMES.has(id) && <SkinPicker value={skin} onChange={setSkin} />}
           <button className="btn yellow" onClick={togglePause}>
             {paused ? "REANUDAR" : "PAUSA"}
           </button>
@@ -108,10 +113,10 @@ export default function GamePlayerPage() {
         </div>
       </div>
 
-      <div className="crt">
+      <div className="crt" data-skin={skin}>
         <div className="crt-screen">
           {Engine ? (
-            <Engine ref={engineRef} onStateChange={handleEngineStateChange} />
+            <Engine ref={engineRef} onStateChange={handleEngineStateChange} skin={skin} />
           ) : (
             <div className="game-arena">
               <div className="grid-floor"></div>
@@ -145,7 +150,7 @@ export default function GamePlayerPage() {
         <div className="crt-bottom">
           <span className="led">SEÑAL OK</span>
           <span>{game.title} · CRT-83 · 60 HZ</span>
-          <span>CARGA · 1MB</span>
+          <span>SKIN · {SKIN_LABELS[skin]}</span>
         </div>
       </div>
 
