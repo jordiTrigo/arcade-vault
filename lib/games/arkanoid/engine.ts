@@ -58,6 +58,7 @@ export function createArkanoidGame(ctx: CanvasRenderingContext2D, initialSkin: A
   let status: ArkanoidStatus = "playing";
   let currentLevel = 1;
   let ready = false;
+  let ballHeld = true;
 
   const keysHeld: Record<string, boolean> = {};
 
@@ -77,10 +78,11 @@ export function createArkanoidGame(ctx: CanvasRenderingContext2D, initialSkin: A
       alive: true,
     }));
     explosions = [];
+    ballHeld = true;
     ball.x = paddle.x + (paddle.w - ball.w) / 2;
     ball.y = paddle.y - ball.h;
-    ball.vx = BASE_BALL_VX * level.speed;
-    ball.vy = BASE_BALL_VY * level.speed;
+    ball.vx = 0;
+    ball.vy = 0;
   }
 
   function collideAABB(block: Block) {
@@ -109,6 +111,12 @@ export function createArkanoidGame(ctx: CanvasRenderingContext2D, initialSkin: A
 
       if (keysHeld["ArrowLeft"]) paddle.x = Math.max(0, paddle.x - PADDLE_SPEED * dt);
       if (keysHeld["ArrowRight"]) paddle.x = Math.min(W - paddle.w, paddle.x + PADDLE_SPEED * dt);
+
+      if (ballHeld) {
+        ball.x = paddle.x + (paddle.w - ball.w) / 2;
+        ball.y = paddle.y - ball.h;
+        return;
+      }
 
       ball.x += ball.vx * dt;
       ball.y += ball.vy * dt;
@@ -173,11 +181,11 @@ export function createArkanoidGame(ctx: CanvasRenderingContext2D, initialSkin: A
           lives = 0;
           status = "gameover";
         } else {
+          ballHeld = true;
           ball.x = paddle.x + (paddle.w - ball.w) / 2;
           ball.y = paddle.y - ball.h;
-          const speed = LEVELS[currentLevel - 1].speed;
-          ball.vx = BASE_BALL_VX * speed;
-          ball.vy = BASE_BALL_VY * speed;
+          ball.vx = 0;
+          ball.vy = 0;
         }
       }
     },
@@ -256,6 +264,12 @@ export function createArkanoidGame(ctx: CanvasRenderingContext2D, initialSkin: A
 
     keyDown(code: string) {
       if (code === "ArrowLeft" || code === "ArrowRight") keysHeld[code] = true;
+      if (code === "Space" && ballHeld) {
+        ballHeld = false;
+        const speed = LEVELS[currentLevel - 1].speed;
+        ball.vx = BASE_BALL_VX * speed;
+        ball.vy = BASE_BALL_VY * speed;
+      }
     },
 
     keyUp(code: string) {

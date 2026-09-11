@@ -16,7 +16,7 @@ export type ArkanoidCanvasProps = {
   skin: SkinId;
 };
 
-const KEYS = ["ArrowLeft", "ArrowRight"];
+const KEYS = ["ArrowLeft", "ArrowRight", "Space"];
 
 export const ArkanoidCanvas = forwardRef<ArkanoidCanvasHandle, ArkanoidCanvasProps>(
   function ArkanoidCanvas({ onStateChange, skin }, ref) {
