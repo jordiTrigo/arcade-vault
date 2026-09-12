@@ -1,19 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+
+function subscribe(onStoreChange: () => void) {
+  const mql = window.matchMedia("(pointer: coarse)");
+  mql.addEventListener("change", onStoreChange);
+  return () => mql.removeEventListener("change", onStoreChange);
+}
+
+function getSnapshot(): boolean {
+  return window.matchMedia("(pointer: coarse)").matches;
+}
+
+function getServerSnapshot(): boolean {
+  return false;
+}
 
 /** Detecta dispositivos de puntero grueso (táctil). false en el primer render. */
 export function useIsTouch(): boolean {
-  const [isTouch, setIsTouch] = useState(false);
-
-  useEffect(() => {
-    const mql = window.matchMedia("(pointer: coarse)");
-    setIsTouch(mql.matches);
-
-    const onChange = (e: MediaQueryListEvent) => setIsTouch(e.matches);
-    mql.addEventListener("change", onChange);
-    return () => mql.removeEventListener("change", onChange);
-  }, []);
-
-  return isTouch;
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

@@ -1,6 +1,6 @@
 # SPEC 10 — Controles táctiles en móvil
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 05, SPEC 07, SPEC 08, SPEC 09
 > **Date:** 2026-09-11
 > **Objective:** Agregar un D-pad y dos botones de acción táctiles debajo del canvas para que los 4 juegos con motor real se puedan jugar completos desde un teléfono.
@@ -86,17 +86,17 @@ Convenciones:
 
 ## Acceptance criteria
 
-- [ ] En un dispositivo/viewport sin puntero táctil (`pointer: fine`), `<TouchControls>` no se renderiza y el teclado funciona exactamente igual que hoy.
-- [ ] En un dispositivo/viewport táctil (`pointer: coarse`), el D-pad y los botones A/B aparecen debajo del `.crt` en `/juego/[id]/jugar` para los 4 juegos con motor real.
-- [ ] asteroides: D-pad izquierda/derecha rota, arriba empuja, botón A dispara; botón B y D-pad abajo no hacen nada.
-- [ ] tetris: D-pad izquierda/derecha mueve, abajo hace bajada suave, arriba rota; botón A rota, botón B hace caída dura (hard drop).
-- [ ] arkanoid: D-pad izquierda/derecha mueve la pala; la bola nace pegada a la pala y no se mueve hasta pulsar el botón A (o `Space` en desktop); D-pad arriba/abajo y botón B no hacen nada.
-- [ ] snake: las 4 flechas del D-pad cambian de dirección (con el bloqueo de reversa de 180° ya existente); botones A y B no hacen nada.
-- [ ] Sostener una dirección del D-pad y pulsar un botón de acción al mismo tiempo funciona (multitáctil real, sin que un puntero cancele al otro).
-- [ ] Los botones sin acción para el juego actual se ven visualmente atenuados.
-- [ ] Tocar cualquier control no dispara scroll ni zoom de la página.
-- [ ] A 360px de ancho de viewport, `/juego/[id]/jugar` no tiene overflow horizontal.
-- [ ] `npm run lint` y `npm run build` terminan sin errores.
+- [x] En un dispositivo/viewport sin puntero táctil (`pointer: fine`), `<TouchControls>` no se renderiza y el teclado funciona exactamente igual que hoy.
+- [x] En un dispositivo/viewport táctil (`pointer: coarse`), el D-pad y los botones A/B aparecen debajo del `.crt` en `/juego/[id]/jugar` para los 4 juegos con motor real.
+- [x] asteroides: D-pad izquierda/derecha rota, arriba empuja, botón A dispara; botón B y D-pad abajo no hacen nada.
+- [x] tetris: D-pad izquierda/derecha mueve, abajo hace bajada suave, arriba rota; botón A rota, botón B hace caída dura (hard drop).
+- [x] arkanoid: D-pad izquierda/derecha mueve la pala; la bola nace pegada a la pala y no se mueve hasta pulsar el botón A (o `Space` en desktop); D-pad arriba/abajo y botón B no hacen nada.
+- [x] snake: las 4 flechas del D-pad cambian de dirección (con el bloqueo de reversa de 180° ya existente); botones A y B no hacen nada.
+- [x] Sostener una dirección del D-pad y pulsar un botón de acción al mismo tiempo funciona (multitáctil real, sin que un puntero cancele al otro).
+- [x] Los botones sin acción para el juego actual se ven visualmente atenuados.
+- [x] Tocar cualquier control no dispara scroll ni zoom de la página.
+- [ ] A 360px de ancho de viewport, `/juego/[id]/jugar` no tiene overflow horizontal. **No cumple tal como está escrito** — hay overflow (~50px), pero la causa es `.av-mobile-panel` (drawer del nav hamburguesa, `position:fixed; transform:translateX(100%)` cuando cerrado), preexistente e idéntico en `/` (home). No lo generan ni `.touch-pad` ni los ajustes de `.player-hud`/`.hud-actions` de este spec (verificado: ningún elemento propio de este spec aparece entre los elementos que exceden el viewport). Fuera de alcance de este spec — requiere spec propio para el nav.
+- [x] `npm run lint` y `npm run build` terminan sin errores.
 
 ## Decisions
 
