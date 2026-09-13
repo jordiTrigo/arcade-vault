@@ -35,3 +35,23 @@ export const GAME_ENGINES: Partial<Record<string, GameEngineComponent>> = {
 };
 
 export const GAME_ENGINE_IDS = Object.keys(GAME_ENGINES);
+
+export type TouchAction = {
+  code: string;
+  label: string;
+};
+
+export type TouchActionMap = {
+  a?: TouchAction;
+  b?: TouchAction;
+};
+
+export const TOUCH_ACTIONS: Partial<Record<string, TouchActionMap>> = {
+  asteroides: { a: { code: "Space", label: "DISPARAR" } },
+  tetris: {
+    a: { code: "KeyX", label: "ROTAR" },
+    b: { code: "Space", label: "CAÍDA" },
+  },
+  arkanoid: { a: { code: "Space", label: "LANZAR" } },
+  snake: {},
+};

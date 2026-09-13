@@ -9,7 +9,9 @@ import { GAME_ENGINES, type GameEngineHandle, type GameEngineState } from "@/lib
 import { saveScore as saveScoreToSupabase } from "@/lib/games/scores";
 import { SKINNED_GAMES, SKIN_LABELS } from "@/lib/games/skins";
 import { useSkin } from "@/lib/games/use-skin";
+import { useIsTouch } from "@/lib/games/use-is-touch";
 import { SkinPicker } from "@/components/skin-picker";
+import { TouchControls } from "@/components/touch-controls";
 
 export default function GamePlayerPage() {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +22,7 @@ export default function GamePlayerPage() {
 
   const Engine = GAME_ENGINES[id];
   const engineRef = useRef<GameEngineHandle>(null);
+  const isTouch = useIsTouch();
   const [skin, setSkin] = useSkin(id);
 
   const [score, setScore] = useState(0);
@@ -153,6 +156,8 @@ export default function GamePlayerPage() {
           <span>SKIN · {SKIN_LABELS[skin]}</span>
         </div>
       </div>
+
+      {isTouch && Engine && <TouchControls gameId={id} />}
 
       {over && (
         <div className="modal-bd">
