@@ -1917,6 +1917,9 @@ a {
     height: 54px;
     font-size: 8px;
   }
+  .modal .input-row {
+    flex-direction: column;
+  }
 }
 
 /* misc */
