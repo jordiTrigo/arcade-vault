@@ -1188,6 +1188,7 @@ a {
   flex-shrink: 0;
 }
 .touch-ab-btn {
+  position: relative;
   width: 64px;
   height: 64px;
   border-radius: 50%;
@@ -1200,34 +1201,74 @@ a {
   font-size: 9px;
   letter-spacing: 0.06em;
   color: var(--ink);
-  background: var(--bg-3);
-  border: 1px solid var(--magenta);
+  border: 2px solid currentColor;
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.25), transparent 50%),
+    radial-gradient(circle at 50% 55%, var(--ab-mid), var(--ab-deep) 75%);
   cursor: pointer;
   touch-action: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   transition:
     box-shadow 100ms ease,
-    transform 80ms ease,
-    color 100ms ease;
+    transform 80ms ease;
+}
+.touch-ab-btn.b {
+  --ab-mid: rgba(0, 200, 230, 0.7);
+  --ab-deep: rgba(0, 50, 70, 0.95);
+  --ab-glow: rgba(0, 245, 255, 0.4);
+  color: var(--cyan);
+}
+.touch-ab-btn.a {
+  --ab-mid: rgba(255, 0, 110, 0.7);
+  --ab-deep: rgba(110, 0, 40, 0.95);
+  --ab-glow: rgba(255, 0, 110, 0.4);
+  color: var(--magenta);
+}
+.touch-ab-btn.b,
+.touch-ab-btn.a {
+  box-shadow:
+    0 0 22px var(--ab-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.4);
 }
 .touch-ab-btn:active {
-  color: var(--magenta);
-  box-shadow:
-    0 0 14px rgba(255, 0, 110, 0.55),
-    inset 0 0 8px rgba(255, 0, 110, 0.35);
   transform: scale(0.94);
+}
+.touch-ab-btn.b:active,
+.touch-ab-btn.a:active {
+  box-shadow:
+    0 0 36px var(--ab-glow),
+    inset 0 0 18px rgba(0, 0, 0, 0.5);
+}
+.touch-ab-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 1px dashed currentColor;
+  opacity: 0;
+  transition:
+    opacity 140ms ease,
+    transform 200ms ease;
+}
+.touch-ab-btn:active .touch-ab-ring {
+  opacity: 1;
+  transform: scale(1.08);
 }
 .touch-ab-btn.inert {
   opacity: 0.35;
   border-color: var(--ink-faint);
   color: var(--ink-faint);
+  background: var(--bg-3);
+  box-shadow: none;
   cursor: default;
 }
 .touch-ab-btn.inert:active {
   box-shadow: none;
   transform: none;
-  color: var(--ink-faint);
+}
+.touch-ab-btn.inert:active .touch-ab-ring {
+  opacity: 0;
 }
 
 .crt {

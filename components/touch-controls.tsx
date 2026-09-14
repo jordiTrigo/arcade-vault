@@ -31,7 +31,15 @@ function DpadButton({ code, path, className }: { code: string; path: string; cla
   );
 }
 
-function ActionButton({ action, fallbackLabel }: { action?: TouchAction; fallbackLabel: string }) {
+function ActionButton({
+  action,
+  fallbackLabel,
+  variant,
+}: {
+  action?: TouchAction;
+  fallbackLabel: string;
+  variant: "a" | "b";
+}) {
   const inert = !action;
 
   const onPointerDown = (e: ReactPointerEvent<HTMLButtonElement>) => {
@@ -47,12 +55,13 @@ function ActionButton({ action, fallbackLabel }: { action?: TouchAction; fallbac
   return (
     <button
       type="button"
-      className={`touch-ab-btn${inert ? " inert" : ""}`}
+      className={`touch-ab-btn ${variant}${inert ? " inert" : ""}`}
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
       onPointerLeave={onPointerUp}
     >
+      <span className="touch-ab-ring" aria-hidden="true" />
       {action ? action.label : fallbackLabel}
     </button>
   );
@@ -73,8 +82,8 @@ export function TouchControls({ gameId }: { gameId: string }) {
         </div>
       </div>
       <div className="touch-ab">
-        <ActionButton action={actions?.b} fallbackLabel="B" />
-        <ActionButton action={actions?.a} fallbackLabel="A" />
+        <ActionButton action={actions?.b} fallbackLabel="B" variant="b" />
+        <ActionButton action={actions?.a} fallbackLabel="A" variant="a" />
       </div>
     </div>
   );
