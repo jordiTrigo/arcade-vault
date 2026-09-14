@@ -48,6 +48,7 @@ Para el listado completo de juegos del catálogo (cuáles tienen motor real vs. 
 - Agente `game-planner` (`.claude/agents/game-planner.md`): decide qué juego nuevo encaja con la plataforma y mantiene el To Do de sugerencias en `references/game-suggestions-todo.md`, recordando lo ya propuesto. Úsalo antes de `/spec-game`.
 - Agente `game-jam` (`.claude/agents/game-jam.md`): recibe un tema de game jam y escribe tres specs (`spec.md`, `design.md`, `engine.md`) en `specs/game-jam/<game-id>/`. Trabaja sin preguntar; los specs quedan en `Draft` para revisar antes de `/spec-impl`.
 - Agente `skin-designer` (`.claude/agents/skin-designer.md`): recibe el id de un juego (uno por invocación) y le crea o revisa sus tres skins (`clasico`, `neon`, `retro`) sobre el contrato de `lib/games/skins.ts`, validando contraste contra el CRT oscuro. Estado en `references/game-skins.md`. Úsalo cuando un juego nuevo entre a `GAME_ENGINES`.
+- Agente `mobile-porter` (`.claude/agents/mobile-porter.md`): audita y corrige cómo se ve y se usa la app en viewports móviles (no hay app nativa — "móvil" es el mismo Next.js en un navegador de teléfono) sobre las 7 pantallas de `app/`, con `specs/10-controles-tactiles-movil.md` como referencia de patrones táctiles ya implementados. Estado en `references/mobile-audit.md`. Úsalo tras cambios de layout/CSS o para retomar deuda móvil conocida (p. ej. el overflow de 360px del drawer de nav documentado en spec 10).
 
 ## Spec-driven workflow
 

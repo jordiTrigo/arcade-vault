@@ -7,15 +7,7 @@ function dispatchKey(type: "keydown" | "keyup", code: string) {
   window.dispatchEvent(new KeyboardEvent(type, { code, bubbles: true }));
 }
 
-function DpadButton({
-  code,
-  label,
-  className,
-}: {
-  code: string;
-  label: string;
-  className: string;
-}) {
+function DpadButton({ code, path, className }: { code: string; path: string; className: string }) {
   const onPointerDown = (e: ReactPointerEvent<HTMLButtonElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     dispatchKey("keydown", code);
@@ -32,7 +24,9 @@ function DpadButton({
       onPointerLeave={onPointerUp}
       aria-label={code}
     >
-      {label}
+      <svg className="touch-key-arrow" viewBox="0 0 24 24">
+        <path d={path} fill="currentColor" />
+      </svg>
     </button>
   );
 }
@@ -70,10 +64,13 @@ export function TouchControls({ gameId }: { gameId: string }) {
   return (
     <div className="touch-pad" style={{ touchAction: "none", userSelect: "none" }}>
       <div className="touch-dpad">
-        <DpadButton code="ArrowUp" label="▲" className="up" />
-        <DpadButton code="ArrowLeft" label="◀" className="left" />
-        <DpadButton code="ArrowRight" label="▶" className="right" />
-        <DpadButton code="ArrowDown" label="▼" className="down" />
+        <DpadButton code="ArrowUp" path="M12 4 L20 16 L4 16 Z" className="up" />
+        <DpadButton code="ArrowLeft" path="M16 4 L16 20 L4 12 Z" className="left" />
+        <DpadButton code="ArrowRight" path="M8 4 L20 12 L8 20 Z" className="right" />
+        <DpadButton code="ArrowDown" path="M4 8 L20 8 L12 20 Z" className="down" />
+        <div className="touch-dpad-hub" aria-hidden="true">
+          <span className="touch-dpad-hub-gem" />
+        </div>
       </div>
       <div className="touch-ab">
         <ActionButton action={actions?.b} fallbackLabel="B" />
